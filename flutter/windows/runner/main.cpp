@@ -1,4 +1,4 @@
-#include <flutter/dart_project.h>
+﻿#include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <tchar.h>
 #include <uni_links_desktop/uni_links_desktop_plugin.h>

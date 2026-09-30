@@ -977,6 +977,12 @@ def build_flutter_windows(version, features, skip_portable_pack):
     os.chdir('..')
     shutil.copy2('target/release/deps/dylib_virtual_display.dll',
                  flutter_build_dir_2)
+    # BINARY_NAME must stay ASCII for CMake; rename the exe to the branded
+    # Chinese name after the build instead.
+    exe_src = os.path.join(flutter_build_dir_2, 'rustdesk.exe')
+    exe_dst = os.path.join(flutter_build_dir_2, 'R远程.exe')
+    if os.path.exists(exe_src):
+        os.rename(exe_src, exe_dst)
     if skip_portable_pack:
         return
     os.chdir('libs/portable')
