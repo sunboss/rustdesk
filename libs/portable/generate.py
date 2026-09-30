@@ -3,9 +3,19 @@
 import os
 import optparse
 import subprocess
+import sys
 from hashlib import md5
 import brotli
 import datetime
+
+# Windows CI runners default to cp1252 console encoding; our branded file
+# names (e.g. R远程.exe) are not encodable there. Force UTF-8 stdout so
+# prints of non-ASCII paths don't crash with UnicodeEncodeError.
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 # 4GB maximum
 length_count = 4
