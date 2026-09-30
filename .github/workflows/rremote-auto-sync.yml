@@ -1,0 +1,59 @@
+name: R远程 auto sync upstream
+
+# 每周自动把上游 rustdesk/rustdesk 的更新合并进 fork，
+# 并把 hbb_common submodule 指向我们 fork 的最新 main（含 R远程 服务器预设）。
+# 合并结果由每天 08:00（北京时间）的 Flutter Nightly Build 自动编译。
+on:
+  schedule:
+    - cron: "0 16 * * 0" # 每周日 16:00 UTC（在 hbb_common 同步之后）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge upstream rustdesk
+        id: merge
+        run: |
+          git config user.name "rremote-sync-bot"
+          git config user.email "rremote-sync-bot@users.noreply.github.com"
+          git remote add upstream https://github.com/rustdesk/rustdesk.git
+          git fetch upstream master
+          if git merge --no-edit upstream/master; then
+            echo "merged=1" >> "$GITHUB_OUTPUT"
+          else
+            git merge --abort
+            echo "merged=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump hbb_common submodule to latest fork main
+        if: steps.merge.outputs.merged == '1'
+        run: |
+          git submodule update --remote --checkout libs/hbb_common
+          git add libs/hbb_common
+          git -c user.name='rremote-sync-bot' -c user.email='rremote-sync-bot@users.noreply.github.com' \
+            commit -m "chore: bump hbb_common submodule to latest main" || echo "no submodule change"
+
+      - name: Push
+        if: steps.merge.outputs.merged == '1'
+        run: git push origin master
+
+      - name: Open issue on conflict
+        if: steps.merge.outputs.merged == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "上游同步冲突：需要手动处理" \
+            --body "本周 rustdesk/rustdesk 上游更新与 R远程 品牌改动存在冲突，自动合并已中止。请手动同步一次。" \
+            --repo "${{ github.repository }}"
