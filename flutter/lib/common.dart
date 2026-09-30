@@ -2969,7 +2969,9 @@ class ServerConfig {
   ServerConfig.fromOptions(Map<String, dynamic> options)
       : idServer = options['custom-rendezvous-server'] ?? "",
         relayServer = options['relay-server'] ?? "",
-        apiServer = options['api-server'] ?? "",
+        apiServer = (options['api-server'] as String?)?.isNotEmpty == true
+            ? options['api-server'] as String
+            : "https://rustdesk.1234r.com",
         key = options['key'] ?? "";
 }
 
