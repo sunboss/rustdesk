@@ -74,6 +74,16 @@ jobs:
           syft dir:. \
             -o cyclonedx-json=rustdesk.sbom.json
 
+      - name: Delete existing release assets
+        if: env.UPLOAD_ARTIFACT == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ env.TAG_NAME }}" --json assets -q '.assets[].name' 2>/dev/null | grep -E '^rustdesk\.sbom\.json$' | while read -r asset; do
+            echo "Deleting existing asset: $asset"
+            gh release delete-asset "${{ env.TAG_NAME }}" "$asset" --yes
+          done
+
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -453,6 +463,23 @@ jobs:
         run: |
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput
 
+      - name: Delete existing release assets
+        if: env.UPLOAD_ARTIFACT == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          for pattern in 'rustdesk-*.msi' 'R远程-*.msi' 'rustdesk-*.exe'; do
+            for f in ./SignOutput/$pattern; do
+              [ -e "$f" ] || continue
+              asset=$(basename "$f")
+              if gh release view "${{ env.TAG_NAME }}" --json assets -q '.assets[].name' 2>/dev/null | grep -qxF "$asset"; then
+                echo "Deleting existing asset: $asset"
+                gh release delete-asset "${{ env.TAG_NAME }}" "$asset" --yes
+              fi
+            done
+          done
+
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -615,6 +642,21 @@ jobs:
         shell: bash
         run: |
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput/
+
+      - name: Delete existing release assets
+        if: env.UPLOAD_ARTIFACT == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          for f in ./SignOutput/rustdesk-*.exe; do
+            [ -e "$f" ] || continue
+            asset=$(basename "$f")
+            if gh release view "${{ env.TAG_NAME }}" --json assets -q '.assets[].name' 2>/dev/null | grep -qxF "$asset"; then
+              echo "Deleting existing asset: $asset"
+              gh release delete-asset "${{ env.TAG_NAME }}" "$asset" --yes
+            fi
+          done
 
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
