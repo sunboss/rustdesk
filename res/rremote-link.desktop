@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=R远程
+NoDisplay=true
+MimeType=x-scheme-handler/rremote;
+TryExec=rremote
+Exec=rremote %u
+Icon=rremote
+Terminal=false
+Type=Application
+StartupNotify=false
+StartupWMClass=rremote
