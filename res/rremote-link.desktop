@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=R远程
+Name=RRemote
 NoDisplay=true
 MimeType=x-scheme-handler/rremote;
 TryExec=rremote

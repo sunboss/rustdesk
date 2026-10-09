@@ -946,10 +946,10 @@ def build_flutter_dmg(version, features):
     mac_arch = 'arm64' if platform.machine().lower() in ('arm64', 'aarch64') else 'x86_64'
     system2(
         f'FLUTTER_XCODE_ARCHS={mac_arch} FLUTTER_XCODE_ONLY_ACTIVE_ARCH=YES flutter build macos --release')
-    system2('cp -rf ../target/release/service ./build/macos/Build/Products/Release/R远程.app/Contents/MacOS/')
+    system2('cp -rf ../target/release/service ./build/macos/Build/Products/Release/RRemote.app/Contents/MacOS/')
     '''
     system2(
-        "create-dmg --volname \"R远程 Installer\" --window-pos 200 120 --window-size 800 400 --icon-size 100 --app-drop-link 600 185 --icon R远程.app 200 190 --hide-extension R远程.app rustdesk.dmg ./build/macos/Build/Products/Release/R远程.app")
+        "create-dmg --volname \"RRemote Installer\" --window-pos 200 120 --window-size 800 400 --icon-size 100 --app-drop-link 600 185 --icon RRemote.app 200 190 --hide-extension RRemote.app rustdesk.dmg ./build/macos/Build/Products/Release/RRemote.app")
     os.rename("rustdesk.dmg", f"../rustdesk-{version}.dmg")
     '''
     os.chdir("..")
@@ -980,7 +980,7 @@ def build_flutter_windows(version, features, skip_portable_pack):
     # BINARY_NAME must stay ASCII for CMake; rename the exe to the branded
     # Chinese name after the build instead.
     exe_src = os.path.join(flutter_build_dir_2, 'rustdesk.exe')
-    exe_dst = os.path.join(flutter_build_dir_2, 'R远程.exe')
+    exe_dst = os.path.join(flutter_build_dir_2, 'RRemote.exe')
     if os.path.exists(exe_src):
         os.rename(exe_src, exe_dst)
     if skip_portable_pack:
@@ -988,7 +988,7 @@ def build_flutter_windows(version, features, skip_portable_pack):
     os.chdir('libs/portable')
     system2('pip3 install -r requirements.txt')
     system2(
-        f'python3 ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/R远程.exe')
+        f'python3 ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/RRemote.exe')
     os.chdir('../..')
     if os.path.exists('./rustdesk_portable.exe'):
         os.replace('./target/release/rustdesk-portable-packer.exe',

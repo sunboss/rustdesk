@@ -1,14 +1,14 @@
 [Desktop Entry]
-Name=R远程
+Name=RRemote
 GenericName=Remote Desktop
-Comment=R远程 - 免费远程桌面控制软件
+Comment=RRemote - 免费远程桌面控制软件
 Exec=rremote %u
 Icon=rremote
 Terminal=false
 Type=Application
 StartupNotify=true
 Categories=Network;RemoteAccess;GTK;
-Keywords=remote-control;remote-desktop;R远程;
+Keywords=remote-control;remote-desktop;RRemote;
 Actions=new-window;
 StartupWMClass=rremote
 

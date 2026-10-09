@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "中邦智能（盐城）科技有限公司" "\0"
-            VALUE "FileDescription", "R远程" "\0"
+            VALUE "FileDescription", "RRemote" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "R远程" "\0"
+            VALUE "InternalName", "RRemote" "\0"
             VALUE "LegalCopyright", "Copyright © 2026 中邦智能（盐城）科技有限公司 All rights reserved." "\0"
-            VALUE "OriginalFilename", "R远程.exe" "\0"
-            VALUE "ProductName", "R远程" "\0"
+            VALUE "OriginalFilename", "RRemote.exe" "\0"
+            VALUE "ProductName", "RRemote" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
