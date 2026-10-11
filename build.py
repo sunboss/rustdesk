@@ -691,8 +691,8 @@ def measured_glibc_floor():
     # libdrmtap is built on a newer base than the rest of the deb, so the floor is whichever staged
     # object is higher -- and it moves whenever either base does.
     paths = [p for p in glob.glob('tmpdeb/usr/lib/rustdesk/libdrmtap.so.0.*')
-             + glob.glob('tmpdeb/usr/share/rustdesk/lib/librustdesk.so')
-             + glob.glob('tmpdeb/usr/share/rustdesk/rustdesk')
+             + glob.glob('tmpdeb/usr/share/rremote/lib/librustdesk.so')
+             + glob.glob('tmpdeb/usr/share/rremote/rustdesk')
              if os.path.isfile(p) and not os.path.islink(p)]
     minor = max((_max_glibc_minor(p) for p in paths), default=0)
     if not minor:
@@ -716,7 +716,7 @@ def retarget_control_to_drm_variant():
         lines = f.readlines()
     out = []
     for line in lines:
-        if line.startswith('Package: rustdesk'):
+        if line.startswith('Package: rremote'):
             out.append(f'Package: {DRM_PACKAGE_NAME}\n')
             out.append('Conflicts: rustdesk\nReplaces: rustdesk\nProvides: rustdesk\n')
         elif line.startswith('Depends:'):
@@ -787,7 +787,7 @@ def build_flutter_deb(version, features):
     os.rename('rremote.deb', '../rremote-%s.deb' % version)
     if ships_so:
         # Named apart from the stock package so installing the consent-free variant is a deliberate act.
-        os.rename('../rustdesk-%s.deb' % version, f'../{DRM_PACKAGE_NAME}-{version}.deb')
+        os.rename('../rremote-%s.deb' % version, f'../{DRM_PACKAGE_NAME}-{version}.deb')
     os.chdir("..")
 
 
@@ -824,8 +824,8 @@ def assert_staged_binary_is_drm():
     Called from BOTH packaging paths. It used to guard only one of them, and `--skip-cargo` (which
     is how CI packages) reaches the other, where nothing had rebuilt the binary at all.
     """
-    binaries = [p for p in glob.glob('tmpdeb/usr/share/rustdesk/lib/librustdesk.so')
-                + glob.glob('tmpdeb/usr/share/rustdesk/rustdesk') if os.path.isfile(p)]
+    binaries = [p for p in glob.glob('tmpdeb/usr/share/rremote/lib/librustdesk.so')
+                + glob.glob('tmpdeb/usr/share/rremote/rustdesk') if os.path.isfile(p)]
     if not any(_carries_drmtap_marker(p) for p in binaries):
         raise Exception(
             f'--drm was requested but the staged bundle does not look like a drm build (no '
@@ -857,7 +857,7 @@ def build_deb_from_folder(version, binary_folder, want_drm=False):
     system2('mkdir -p tmpdeb/usr/share/polkit-1/actions')
     system2('rm tmpdeb/usr/bin/rremote || true')
     system2(
-        f'cp -r ../{binary_folder}/* tmpdeb/usr/share/rustdesk/')
+        f'cp -r ../{binary_folder}/* tmpdeb/usr/share/rremote/')
     system2(
         'cp ../res/rustdesk.service tmpdeb/usr/share/rremote/files/systemd/')
     system2(
@@ -876,7 +876,7 @@ def build_deb_from_folder(version, binary_folder, want_drm=False):
     # here actually produces -- the flutter deb builds the library straight into the staged deb, so
     # nothing ever puts it inside the bundle folder. Demanding it in the bundle made this flag
     # combination impossible to satisfy.
-    bundled_glob = glob.glob('tmpdeb/usr/share/rustdesk/libdrmtap.so.0.*')
+    bundled_glob = glob.glob('tmpdeb/usr/share/rremote/libdrmtap.so.0.*')
     bundle_carries_so = any(os.path.isfile(p) and not os.path.islink(p) for p in bundled_glob)
     # The variant must be decided by the EXPLICIT --drm request, not merely by what happens to be
     # staged: a bundle that carries the .so must NOT be shipped as the consent-bypass variant when
@@ -907,7 +907,7 @@ def build_deb_from_folder(version, binary_folder, want_drm=False):
             _assert_so_has_no_helper(so)
             stage_libdrmtap_into_deb(so)
             system2(f'rm -f "{so}"')
-            system2('rm -f tmpdeb/usr/share/rustdesk/libdrmtap.so tmpdeb/usr/share/rustdesk/libdrmtap.so.0')
+            system2('rm -f tmpdeb/usr/share/rremote/libdrmtap.so tmpdeb/usr/share/rremote/libdrmtap.so.0')
         else:
             # Build it here, exactly as the flutter deb path does (build_libdrmtap_so asserts the
             # EGL backend itself). The library is independent of the staged binary.
@@ -927,7 +927,7 @@ def build_deb_from_folder(version, binary_folder, want_drm=False):
     system2('/bin/rm -rf ../res/DEBIAN/control')
     os.rename('rremote.deb', '../rremote-%s.deb' % version)
     if want_drm:
-        os.rename('../rustdesk-%s.deb' % version, f'../{DRM_PACKAGE_NAME}-{version}.deb')
+        os.rename('../rremote-%s.deb' % version, f'../{DRM_PACKAGE_NAME}-{version}.deb')
     os.chdir("..")
 
 
@@ -1161,7 +1161,7 @@ def main():
                 system2('mkdir -p tmpdeb/usr/share/icons/hicolor/256x256/apps/')
                 system2('mkdir -p tmpdeb/usr/share/icons/hicolor/scalable/apps/')
                 system2(
-                    'cp res/rustdesk.service tmpdeb/usr/share/rustdesk/files/systemd/')
+                    'cp res/rustdesk.service tmpdeb/usr/share/rremote/files/systemd/')
                 system2(
                     'cp res/128x128@2x.png tmpdeb/usr/share/icons/hicolor/256x256/apps/rustdesk.png')
                 system2(
@@ -1173,8 +1173,8 @@ def main():
                 os.system('cp -a DEBIAN/* tmpdeb/DEBIAN/')
                 system2('strip tmpdeb/usr/bin/rustdesk')
                 system2('mkdir -p tmpdeb/usr/share/rremote')
-                system2('mv tmpdeb/usr/bin/rustdesk tmpdeb/usr/share/rustdesk/')
-                system2('cp libsciter-gtk.so tmpdeb/usr/share/rustdesk/')
+                system2('mv tmpdeb/usr/bin/rustdesk tmpdeb/usr/share/rremote/')
+                system2('cp libsciter-gtk.so tmpdeb/usr/share/rremote/')
                 md5_file_folder("tmpdeb/")
                 system2('dpkg-deb -b tmpdeb rustdesk.deb; /bin/rm -rf tmpdeb/')
                 os.rename('rustdesk.deb', 'rustdesk-%s.deb' % version)

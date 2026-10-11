@@ -1005,6 +1005,7 @@ jobs:
       - name: Rename rustdesk
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
+          shopt -s nullglob
           for name in rustdesk*??.dmg; do
               mv "$name" "${name%%.dmg}-${{ matrix.job.arch }}.dmg"
           done
@@ -1016,7 +1017,7 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            rustdesk*-${{ matrix.job.arch }}.dmg
+            RRemote*-${{ matrix.job.arch }}.dmg
 
   publish_unsigned:
     needs:
@@ -1824,7 +1825,8 @@ jobs:
             export CARGO_INCREMENTAL=0
             export DEB_ARCH=${{ matrix.job.deb_arch }}
             python3 ./build.py --flutter --skip-cargo
-            for name in rustdesk*??.deb; do
+            shopt -s nullglob
+            for name in rremote*??.deb; do
               mv "$name" "${name%%.deb}-${{ matrix.job.arch }}.deb"
             done
 
@@ -1863,7 +1865,7 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            rustdesk-*.deb
+            rremote-*.deb
             rustdesk-*.rpm
 
       - name: Upload deb
@@ -2449,14 +2451,14 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+            rremote-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
 
       - name: Upload deb
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
-          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
-          path: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+          name: rremote-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+          path: rremote-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
 
   build-appimage:
     name: Build appimage ${{ matrix.job.target }}
