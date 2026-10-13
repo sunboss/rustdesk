@@ -980,7 +980,7 @@ def build_flutter_windows(version, features, skip_portable_pack):
     # BINARY_NAME must stay ASCII for CMake; rename the exe to the branded
     # Chinese name after the build instead.
     exe_src = os.path.join(flutter_build_dir_2, 'rustdesk.exe')
-    exe_dst = os.path.join(flutter_build_dir_2, 'RRemote.exe')
+    exe_dst = os.path.join(flutter_build_dir_2, 'R远程.exe')
     if os.path.exists(exe_src):
         os.rename(exe_src, exe_dst)
     if skip_portable_pack:
@@ -988,7 +988,7 @@ def build_flutter_windows(version, features, skip_portable_pack):
     os.chdir('libs/portable')
     system2('pip3 install -r requirements.txt')
     system2(
-        f'python3 ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/RRemote.exe')
+        f'python3 ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/R远程.exe')
     os.chdir('../..')
     if os.path.exists('./rustdesk_portable.exe'):
         os.replace('./target/release/rustdesk-portable-packer.exe',
