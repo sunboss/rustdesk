@@ -464,11 +464,16 @@ def init_global_vars(dist_dir, app_name, args):
     dist_app = dist_dir.joinpath(app_name + ".exe")
 
     def read_process_output(args):
+        # Do not go through cmd.exe: on the Windows runners, shell=True with a
+        # CJK exe name (R远程.exe) makes cmd fail to resolve the program
+        # ("... is not recognized as an internal or external command"), which
+        # breaks --version/--build-date probing and kills the MSI step.
+        # An argv list bypasses cmd entirely and keeps Unicode intact.
         process = subprocess.Popen(
-            f'"{dist_app}" {args}',
+            [str(dist_app), args],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            shell=True,
+            shell=False,
         )
         output, _ = process.communicate()
         return output.decode("utf-8").strip()
