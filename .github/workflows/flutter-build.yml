@@ -61,7 +61,10 @@ env:
   MACOS_P12_BASE64: "${{ secrets.MACOS_P12_BASE64 }}"
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   PUBLISH_UPDATE_METADATA: "${{ inputs.publish-update-metadata }}"
-  SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL-2 }}"
+  # Fork has no access to upstream's signing service; "-2" is upstream's own
+  # opt-out value that skips every Sign/Verify step. Restore the
+  # "${{ secrets.SIGN_BASE_URL-2 }}" reference if this fork ever gets signing.
+  SIGN_BASE_URL: "-2"
 
 jobs:
   validate-update-metadata-keys:
@@ -1219,7 +1222,7 @@ jobs:
           rcodesign notary-submit --api-key-path ${{ github.workspace }}/rustdesk.json  --staple rustdesk-${{ env.VERSION }}.dmg
 
       - name: Rename rustdesk
-        if: env.UPLOAD_ARTIFACT == 'true'
+        if: env.UPLOAD_ARTIFACT == 'true' && env.MACOS_P12_BASE64 != null
         shell: bash
         env:
           VERSION: ${{ env.VERSION }}
